@@ -17,7 +17,11 @@
 
 package com.example.android.devbyteviewer.repository
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Transformations
 import com.example.android.devbyteviewer.database.VideosDatabase
+import com.example.android.devbyteviewer.database.asDomainModel
+import com.example.android.devbyteviewer.domain.Video
 import com.example.android.devbyteviewer.network.Network
 import com.example.android.devbyteviewer.network.asDatabaseModel
 import kotlinx.coroutines.Dispatchers
@@ -26,9 +30,13 @@ import kotlinx.coroutines.withContext
 // TODO (01) Create a VideosRepository class that takes a VideosDatabase argument.
 class VideosRepository(private val videosDatabase: VideosDatabase) {
 
+    // TODO (03) Define a Transformations.map to convert the DatabaseVideo list to a list of Video.
+    val videos: LiveData<List<Video>> = Transformations.map(videosDatabase.videoDao.getVideos()) {
+        it.asDomainModel()
+    }
+
     // TODO (02) Define a suspend refreshVideos() function that gets data from the network and
     //  inserts it into the database.
-    // TODO (03) Define a Transformations.map to convert the DatabaseVideo list to a list of Video.
     suspend fun refreshVideos() {
         withContext(Dispatchers.IO) {
             val playlist = Network.devbytes.getPlaylist().await()
